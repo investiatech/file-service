@@ -1,0 +1,16 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: file-service
+  data:
+    mongodb:
+      uri: mongodb://files:filesapppass@localhost:27017/files?authSource=files
+
+minio:
+  endpoint: http://localhost:9000
+  access-key: admin
+  secret-key: miniopass
+  bucket: user-files
+  create-bucket-if-not-exists: true
