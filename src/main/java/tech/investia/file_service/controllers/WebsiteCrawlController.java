@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tech.investia.file_service.dto.ResourceResponse;
 import tech.investia.file_service.dto.WebsiteCrawlRequest;
-import tech.investia.file_service.models.WebsiteCrawl;
 import tech.investia.file_service.services.WebsiteCrawlService;
 
 import java.util.List;
