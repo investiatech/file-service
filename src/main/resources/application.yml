@@ -19,5 +19,5 @@ spring.servlet.multipart:
   max-file-size: 50MB
   max-request-size: 50MB
 
-ingest:
+ingestservice:
   base-url: http://localhost:8081

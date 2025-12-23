@@ -2,10 +2,8 @@ package tech.investia.file_service.services;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import tech.investia.file_service.dto.Language;
-import tech.investia.file_service.dto.ResourceResponse;
-import tech.investia.file_service.dto.ResourceStatus;
-import tech.investia.file_service.dto.ResourceType;
+import org.springframework.web.reactive.function.client.WebClient;
+import tech.investia.file_service.dto.*;
 import tech.investia.file_service.models.FileResource;
 import tech.investia.file_service.repositories.FileResourceRepository;
 import tech.investia.file_service.storage.UploadResult;
@@ -17,10 +15,12 @@ import java.util.Objects;
 public class FileIngestService {
     private final MinioStorageService minioStorageService;
     private final FileResourceRepository fileResourceRepository;
+    private final WebClient ingestServiceWebClient;
 
-    public FileIngestService(MinioStorageService minioStorageService, FileResourceRepository fileResourceRepository) {
+    public FileIngestService(MinioStorageService minioStorageService, FileResourceRepository fileResourceRepository, WebClient ingestServiceWebClient) {
         this.minioStorageService = minioStorageService;
         this.fileResourceRepository = fileResourceRepository;
+        this.ingestServiceWebClient = ingestServiceWebClient;
     }
 
     public ResourceResponse uploadAndRecord(MultipartFile file, String objectName, boolean overwrite) throws Exception {
@@ -39,6 +39,14 @@ public class FileIngestService {
         fileResource.setDetails(Map.of("OriginalFilename", Objects.requireNonNull(file.getOriginalFilename())));
 
         FileResource saved = fileResourceRepository.save(fileResource);
+
+        //call ingest-service
+        ingestServiceWebClient.post()
+                .uri("/api/ingest/fromFile")
+                .bodyValue(new IngestFromFileRequest(saved.getId()))
+                .retrieve()
+                .toBodilessEntity()
+                .block();
 
         return new ResourceResponse(
                 saved.getId(),

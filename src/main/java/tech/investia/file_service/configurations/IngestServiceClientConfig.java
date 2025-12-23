@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class FileServiceClientConfig {
+public class IngestServiceClientConfig {
     @Bean
-    WebClient fileServiceWebClient(@Value("${ingest.base-url}") String baseUrl) {
+    WebClient fileServiceWebClient(@Value("${ingestservice.base-url}") String baseUrl) {
         return WebClient.builder().baseUrl(baseUrl).build();
     }
 }
