@@ -73,12 +73,12 @@ public class WebsiteCrawlMapper {
         );
     }
 
-    private static <E extends Enum<E>> E safeEnum(Class<E> type, String value, E fallback) {
-        try {
-            return Enum.valueOf(type, value);
-        } catch (IllegalArgumentException | NullPointerException e) {
-            return fallback;
-        }
-    }
+//    private static <E extends Enum<E>> E safeEnum(Class<E> type, String value, E fallback) {
+//        try {
+//            return Enum.valueOf(type, value);
+//        } catch (IllegalArgumentException | NullPointerException e) {
+//            return fallback;
+//        }
+//    }
 
 }

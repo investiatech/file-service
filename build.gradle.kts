@@ -26,6 +26,8 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     // https://mvnrepository.com/artifact/io.minio/minio
     implementation("io.minio:minio:8.6.0")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
 }
 
 tasks.withType<Test> {

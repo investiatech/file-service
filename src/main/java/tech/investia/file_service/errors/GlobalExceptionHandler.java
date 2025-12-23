@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.nio.file.FileAlreadyExistsException;
+import java.time.Instant;
 import java.util.Map;
 
 @ControllerAdvice
@@ -14,11 +15,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileAlreadyExistsException.class)
     public ResponseEntity<Map<String, Object>> handleFileExists(FileAlreadyExistsException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
-                "error", "Object already exists",
-                "message", ex.getMessage(),
-                "status", HttpStatus.CONFLICT.value()
-        ));
+        Map<String, Object> body = Map.of(
+                "timestamp", Instant.now().toString(),
+                "status", HttpStatus.CONFLICT.value(),
+                "error", "Conflict",
+                "message", ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)

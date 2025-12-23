@@ -10,7 +10,7 @@ import tech.investia.file_service.services.WebsiteCrawlService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/resource")
+@RequestMapping("/api/resource/website")
 public class WebsiteCrawlController {
 
     private final WebsiteCrawlService websiteCrawlService;

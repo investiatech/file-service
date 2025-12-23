@@ -3,6 +3,7 @@ package tech.investia.file_service.controllers;
 import io.minio.GetObjectResponse;
 import io.minio.StatObjectArgs;
 import io.minio.StatObjectResponse;
+import org.intellij.lang.annotations.RegExp;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import tech.investia.file_service.dto.FileUploadRequest;
+import tech.investia.file_service.dto.Language;
 import tech.investia.file_service.dto.ResourceResponse;
+import tech.investia.file_service.mappers.ResourceMapper;
 import tech.investia.file_service.models.FileResource;
 import tech.investia.file_service.services.FileIngestService;
 import tech.investia.file_service.services.FileResourceService;
@@ -26,6 +29,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RestController
@@ -34,11 +38,13 @@ public class FileResourceController {
     private final FileIngestService fileIngestService;
     private final MinioStorageService minioStorageService;
     private final FileResourceService fileResourceService;
+    private final ResourceMapper resourceMapper;
 
-    public FileResourceController(FileIngestService fileIngestService, MinioStorageService minioStorageService, FileResourceService fileResourceService) {
+    public FileResourceController(FileIngestService fileIngestService, MinioStorageService minioStorageService, FileResourceService fileResourceService, ResourceMapper resourceMapper) {
         this.fileIngestService = fileIngestService;
         this.minioStorageService = minioStorageService;
         this.fileResourceService = fileResourceService;
+        this.resourceMapper = resourceMapper;
     }
 
     @PostMapping("/upload")
@@ -60,8 +66,11 @@ public class FileResourceController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<FileResource>> listAll() {
-        return ResponseEntity.ok(fileResourceService.findAll());
+    public List<ResourceResponse> listAll() {
+        return fileResourceService.findAll()
+                .stream()
+                .map(resourceMapper::toResourceResponse)
+                .collect(Collectors.toList());
     }
 
 //    @GetMapping("/pagination")
@@ -75,13 +84,12 @@ public class FileResourceController {
 //        return ResponseEntity.ok(fileResourceService.findAll(pageable));
 //    }
 
-    @GetMapping("/{id}/download")
+    @GetMapping("/download/{id}")
     public ResponseEntity<StreamingResponseBody> downloadById(@PathVariable String id) throws Exception {
         FileResource fileResource = fileResourceService.findById(id).orElse(null);
         if (fileResource == null) return ResponseEntity.notFound().build();
         StatObjectResponse statObjectResponse = minioStorageService.statObjectResponse(fileResource.getBucket(), fileResource.getObjectKey());
-        String contentType = Optional.ofNullable(fileResource.getContentType())
-                .orElse(Optional.ofNullable(statObjectResponse.contentType()).orElse("application/octet-stream"));
+        String contentType = Optional.ofNullable(fileResource.getContentType()).orElse(Optional.ofNullable(statObjectResponse.contentType()).orElse("application/octet-stream"));
         long size = statObjectResponse.size();
         GetObjectResponse objectStream = minioStorageService.getObjectResponse(fileResource.getBucket(), fileResource.getObjectKey());
         StreamingResponseBody streamingResponseBody = outputStream -> {
@@ -92,11 +100,7 @@ public class FileResourceController {
         };
         String filename = Optional.ofNullable(fileResource.getName()).orElse(fileResource.getObjectKey());
         String contentDisposition = contentDisposition(filename);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
-                .contentType(MediaType.parseMediaType(contentType))
-                .contentLength(size)
-                .body(streamingResponseBody);
+        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition).contentType(MediaType.parseMediaType(contentType)).contentLength(size).body(streamingResponseBody);
     }
 
     @DeleteMapping("/{id}")

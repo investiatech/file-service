@@ -4,7 +4,6 @@ import io.minio.*;
 import io.minio.errors.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import tech.investia.file_service.errors.FileAlreadyExistsException;
 import tech.investia.file_service.storage.UploadResult;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
