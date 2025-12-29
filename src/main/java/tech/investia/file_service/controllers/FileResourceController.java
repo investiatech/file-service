@@ -103,7 +103,7 @@ public class FileResourceController {
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition).contentType(MediaType.parseMediaType(contentType)).contentLength(size).body(streamingResponseBody);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable String id) {
         boolean deleted = fileResourceService.deleteById(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();

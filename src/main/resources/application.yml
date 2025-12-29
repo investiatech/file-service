@@ -7,6 +7,11 @@ spring:
   data:
     mongodb:
       uri: mongodb://files:filesapppass@localhost:27017/files?authSource=files
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "http://localhost:8085/api/auth/keys/jwks.json"
 
 minio:
   endpoint: http://localhost:9000
