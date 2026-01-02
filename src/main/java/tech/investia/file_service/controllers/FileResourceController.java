@@ -4,6 +4,8 @@ import io.minio.GetObjectResponse;
 import io.minio.StatObjectArgs;
 import io.minio.StatObjectResponse;
 import org.intellij.lang.annotations.RegExp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +37,7 @@ import java.util.stream.Stream;
 @RestController
 @RequestMapping("/api/resource/files")
 public class FileResourceController {
+    private static final Logger log = LoggerFactory.getLogger(FileResourceController.class);
     private final FileIngestService fileIngestService;
     private final MinioStorageService minioStorageService;
     private final FileResourceService fileResourceService;
@@ -50,16 +53,19 @@ public class FileResourceController {
     @PostMapping("/upload")
     public ResponseEntity<?> uploadOne(
             @RequestParam("file") MultipartFile file,
-            @ModelAttribute FileUploadRequest meta
+            @ModelAttribute FileUploadRequest meta,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization
     ) throws Exception {
         try {
             String name = (meta.name() != null && !meta.name().isBlank())
                     ? meta.name()
                     : file.getOriginalFilename();
 
-            ResourceResponse response = fileIngestService.uploadAndRecord(file, name, meta.overwrite());
+            ResourceResponse response = fileIngestService.uploadAndRecord(file, name, meta.overwrite(), authorization);
+//            fileIngestService.triggerIngest(response.id(), authorization);
             return ResponseEntity.ok(response);
-        } catch (IllegalStateException exists) {
+        } catch (Exception ex) {
+
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("error", "Object already exists"));
         }

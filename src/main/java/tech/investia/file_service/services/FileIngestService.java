@@ -1,5 +1,8 @@
 package tech.investia.file_service.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,6 +16,7 @@ import java.util.Objects;
 
 @Service
 public class FileIngestService {
+    private static final Logger log = LoggerFactory.getLogger(FileIngestService.class);
     private final MinioStorageService minioStorageService;
     private final FileResourceRepository fileResourceRepository;
     private final WebClient ingestServiceWebClient;
@@ -23,7 +27,7 @@ public class FileIngestService {
         this.ingestServiceWebClient = ingestServiceWebClient;
     }
 
-    public ResourceResponse uploadAndRecord(MultipartFile file, String objectName, boolean overwrite) throws Exception {
+    public ResourceResponse uploadAndRecord(MultipartFile file, String objectName, boolean overwrite, String authorization) throws Exception {
         UploadResult uploadResult = minioStorageService.upload(file, objectName, overwrite);
 
         FileResource fileResource = new FileResource();
@@ -43,6 +47,7 @@ public class FileIngestService {
         //call ingest-service
         ingestServiceWebClient.post()
                 .uri("/api/ingest/fromFile")
+                .header(HttpHeaders.AUTHORIZATION, authorization)
                 .bodyValue(new IngestFromFileRequest(saved.getId()))
                 .retrieve()
                 .toBodilessEntity()
@@ -61,6 +66,27 @@ public class FileIngestService {
                 ),
                 saved.getResourceStatus()
         );
+    }
+
+    public void triggerIngest(String fileId, String authorization) {
+        System.out.println(authorization);
+        log.info("AUTH={}", authorization);
+
+//        ingestServiceWebClient.post()
+//                .uri("/api/ingest/fromFile")
+//                .header(HttpHeaders.AUTHORIZATION, authorization)
+//                .bodyValue(new IngestFromFileRequest(fileId))
+//                .retrieve()
+//                .toBodilessEntity()
+//                .block();
+
+        ingestServiceWebClient.post()
+                .uri("/api/ingest/fromFile")
+                .header(HttpHeaders.AUTHORIZATION, authorization)   // <- MUSI BYĆ
+                .bodyValue(Map.of("fileId", fileId))                // albo IngestFromFileRequest
+                .retrieve()
+                .toBodilessEntity()
+                .block();
     }
 
 }
