@@ -2,6 +2,8 @@ server:
   port: 8086
 
 spring:
+  codec:
+    max-in-memory-size: 16MB
   application:
     name: file-service
   data:
@@ -26,3 +28,8 @@ spring.servlet.multipart:
 
 ingestservice:
   base-url: http://localhost:8081
+
+n8n:
+  baseUrl: https://n8n.easy-ai.it/webhook/e9e561c2-cbce-42b4-9270-c4e3c0cbec17
+  username: admin
+  password: quickSteps89

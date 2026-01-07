@@ -61,7 +61,7 @@ public class FileResourceController {
                     ? meta.name()
                     : file.getOriginalFilename();
 
-            ResourceResponse response = fileIngestService.uploadAndRecord(file, name, meta.overwrite(), authorization);
+            ResourceResponse response = fileIngestService.uploadAndRecord(file, name, meta.overwrite());
 //            fileIngestService.triggerIngest(response.id(), authorization);
             return ResponseEntity.ok(response);
         } catch (Exception ex) {

@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class IngestServiceClientConfig {
     @Bean
-    WebClient fileServiceWebClient(@Value("${ingestservice.base-url}") String baseUrl) {
+    WebClient ingestServiceWebClient(@Value("${ingestservice.base-url}") String baseUrl) {
         return WebClient.builder().baseUrl(baseUrl).build();
     }
 }

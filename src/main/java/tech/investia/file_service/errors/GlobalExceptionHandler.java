@@ -33,13 +33,45 @@ public class GlobalExceptionHandler {
         ));
     }
 
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+//                "error", "Internal Server Error",
+//                "message", ex.getMessage(),
+//                "status", HttpStatus.INTERNAL_SERVER_ERROR.value()
+//        ));
+//    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                "error", "Internal Server Error",
-                "message", ex.getMessage(),
-                "status", HttpStatus.INTERNAL_SERVER_ERROR.value()
-        ));
+    public ResponseEntity<?> handleGeneric(Exception ex) {
+        ex.printStackTrace();
+        String msg = ex.getMessage();
+        if (msg == null || msg.isBlank()) {
+            msg = ex.getClass().getSimpleName();
+        }
+
+        return ResponseEntity.status(500).body(
+                Map.of(
+                        "error", "Internal Server Error",
+                        "message", msg,
+                        "status", 500
+                )
+        );
     }
+
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<?> handleGeneric(Exception ex) {
+//        String msg = ex.getMessage();
+//        if (msg == null || msg.isBlank()) {
+//            msg = ex.getClass().getSimpleName();
+//        }
+//        return ResponseEntity.status(500).body(
+//                Map.of(
+//                        "error", "Internal Server Error",
+//                        "message", msg,
+//                        "status", 500
+//                )
+//        );
+//    }
 
 }

@@ -115,4 +115,18 @@ public class MinioStorageService {
         }
     }
 
+    public UploadResult uploadBytes(byte[] bytes, String objectName, String contentType, boolean overwrite) throws Exception {
+        try (java.io.InputStream in = new java.io.ByteArrayInputStream(bytes)) {
+            minioClient.putObject(
+                    io.minio.PutObjectArgs.builder()
+                            .bucket(bucket())
+                            .object(objectName)
+                            .stream(in, bytes.length, -1)
+                            .contentType(contentType)
+                            .build()
+            );
+            return new UploadResult(objectName, null, bytes.length, contentType);
+        }
+    }
+
 }

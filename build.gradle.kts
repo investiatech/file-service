@@ -28,8 +28,8 @@ dependencies {
     implementation("io.minio:minio:8.6.0")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 //    testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
-    implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+//    implementation("org.springframework.boot:spring-boot-starter-security")
+//    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 }
 
 tasks.withType<Test> {
